@@ -82,88 +82,88 @@ try {
   await journeyRef.update({ status: journeyStatus });
   console.log(`Updated journey ${JOURNEY_ID} status to ${journeyStatus}`);
 
-  // If passed, also resolve any linked issues and create evidence
-  if (passed) {
-    // Build base64 screenshots array (first + last only, to stay under Firestore 1MiB limit)
-    const screenshots = [];
-    const files = existsSync("results")
-      ? readdirSync("results").filter(f => f.endsWith(".jpg")).sort()
-      : [];
-    const picked = files.length <= 2 ? files : [files[0], files[files.length - 1]];
-    const MAX_TOTAL_BASE64_BYTES = 700_000; // safety margin under Firestore's ~1MiB doc limit
-    let runningSize = 0;
-    for (const filename of picked) {
-      const buf = readFileSync(`results/${filename}`);
-      const base64 = buf.toString("base64");
-      if (runningSize + base64.length > MAX_TOTAL_BASE64_BYTES) {
-        console.warn(`Skipping screenshot ${filename} — would exceed Firestore document size safety margin`);
-        continue;
-      }
-      runningSize += base64.length;
-      const step = filename.replace(/^\d+-/, "").replace(/\.jpg$/, "").replace(/-/g, " ");
-      screenshots.push({
-        step: step.charAt(0).toUpperCase() + step.slice(1),
-        url: `data:image/jpeg;base64,${base64}`,
-      });
+  // Build base64 screenshots array (first + last only, to stay under Firestore 1MiB limit)
+  const screenshots = [];
+  const files = existsSync("results")
+    ? readdirSync("results").filter(f => f.endsWith(".jpg")).sort()
+    : [];
+  const picked = files.length <= 2 ? files : [files[0], files[files.length - 1]];
+  const MAX_TOTAL_BASE64_BYTES = 700_000; // safety margin under Firestore's ~1MiB doc limit
+  let runningSize = 0;
+  for (const filename of picked) {
+    const buf = readFileSync(`results/${filename}`);
+    const base64 = buf.toString("base64");
+    if (runningSize + base64.length > MAX_TOTAL_BASE64_BYTES) {
+      console.warn(`Skipping screenshot ${filename} — would exceed Firestore document size safety margin`);
+      continue;
     }
+    runningSize += base64.length;
+    const step = filename.replace(/^\d+-/, "").replace(/\.jpg$/, "").replace(/-/g, " ");
+    screenshots.push({
+      step: step.charAt(0).toUpperCase() + step.slice(1),
+      url: `data:image/jpeg;base64,${base64}`,
+    });
+  }
 
-    const issuesSnap = await db
-      .collection(`users/${ACCOUNT_ID}/issues`)
-      .where("journeyId", "==", JOURNEY_ID)
-      .where("status", "==", "Validation Required")
-      .get();
+  const issuesSnap = await db
+    .collection(`users/${ACCOUNT_ID}/issues`)
+    .where("journeyId", "==", JOURNEY_ID)
+    .where("status", "==", "Validation Required")
+    .get();
 
-    for (const issueDoc of issuesSnap.docs) {
+  for (const issueDoc of issuesSnap.docs) {
+    if (passed) {
       await issueDoc.ref.update({ status: "Resolved" });
       console.log(`Resolved issue ${issueDoc.id}`);
-
-      // Create evidence record
-      const issue = issueDoc.data();
-      const now = new Date().toISOString();
-      const evidenceId = `PR-${Date.now().toString(36).toUpperCase()}`;
-      const journeyDoc = await journeyRef.get();
-      const journey = journeyDoc.data();
-
-      await db.doc(`users/${ACCOUNT_ID}/evidence/${evidenceId}`).set({
-        websiteId: issue.websiteId,
-        issueId: issueDoc.id,
-        issue: issue.title,
-        risk: issue.severity,
-        outcome: "Resolved",
-        date: now.split("T")[0],
-        createdAt: now,
-        status: "Verified",
-        businessImpact: issue.businessImpact,
-        dependencyChain: (issue.dependencies || []).map((d) => d.label).join(" → "),
-        proposedRepair: issue.repair?.proposedRepair || "",
-        safety: `${issue.safety?.riskLevel || "Medium"} Risk — ${issue.safety?.decision || "Reviewed"}`,
-        approval: "Approved",
-        patchPreview: "Reviewed",
-        repairStatus: "Applied",
-        validationPerformed: journey?.name ? `${journey.name} Journey` : "Component checks",
-        validationOutcome: "Passed",
-        rollback: "Not required",
-        before: [
-          { label: journey?.name ? `${journey.name} Journey` : "Component", value: "At Risk" },
-          ...(issue.patchPreview?.current || []),
-        ],
-        after: [
-          { label: journey?.name ? `${journey.name} Journey` : "Component", value: "Passed" },
-          ...(issue.patchPreview?.proposed || []),
-        ],
-        timeline: [
-          { stage: "Issue detected", time: issue.detected || now },
-          { stage: "Dependencies analysed", time: issue.detected || now },
-          { stage: "Repair proposed", time: issue.detected || now },
-          { stage: "Repair approved", time: now },
-          { stage: "Repair applied", time: now },
-          { stage: "Journey validated (Playwright)", time: now },
-          { stage: "Evidence verified", time: now },
-        ],
-        screenshots,
-      });
-      console.log(`Created evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
     }
+
+    // Create evidence record
+    const issue = issueDoc.data();
+    const now = new Date().toISOString();
+    const evidenceId = `PR-${Date.now().toString(36).toUpperCase()}`;
+    const journeyDoc = await journeyRef.get();
+    const journey = journeyDoc.data();
+
+    await db.doc(`users/${ACCOUNT_ID}/evidence/${evidenceId}`).set({
+      websiteId: issue.websiteId,
+      issueId: issueDoc.id,
+      issue: issue.title,
+      risk: issue.severity,
+      outcome: passed ? "Resolved" : "Failed",
+      date: now.split("T")[0],
+      createdAt: now,
+      status: passed ? "Verified" : "Pending",
+      businessImpact: issue.businessImpact,
+      dependencyChain: (issue.dependencies || []).map((d) => d.label).join(" → "),
+      proposedRepair: issue.repair?.proposedRepair || "",
+      safety: `${issue.safety?.riskLevel || "Medium"} Risk — ${issue.safety?.decision || "Reviewed"}`,
+      approval: "Approved",
+      patchPreview: passed ? "Component successfully patched and verified." : "Component patched but validation failed.",
+      repairStatus: passed ? "Applied" : "Rolled Back",
+      validationPerformed: journey?.name ? `${journey.name} Journey` : "Component checks",
+      validationOutcome: passed ? "Passed" : "Failed",
+      rollback: passed ? "Not required" : "Triggered automatic rollback to previous version",
+      before: [
+        { label: journey?.name ? `${journey.name} Journey` : "Component", value: "At Risk" },
+        ...(issue.patchPreview?.current || []),
+      ],
+      after: [
+        { label: journey?.name ? `${journey.name} Journey` : "Component", value: passed ? "Passed" : "Failed" },
+        ...(issue.patchPreview?.proposed || []),
+      ],
+      timeline: [
+        { stage: "Issue detected", time: issue.detected || now },
+        { stage: "Dependencies analysed", time: issue.detected || now },
+        { stage: "Repair proposed", time: issue.detected || now },
+        { stage: "Repair approved", time: now },
+        { stage: "Repair applied", time: now },
+        { stage: "Journey validated (Playwright)", time: now },
+        ...(passed ? [] : [{ stage: "Automatic Rollback applied", time: now }]),
+        { stage: "Evidence verified", time: now },
+      ],
+      screenshots,
+    });
+    console.log(`Created evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
   }
 
   console.log("Firebase update complete.");
