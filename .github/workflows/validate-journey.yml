@@ -31,7 +31,7 @@ jobs:
           JOURNEY_TYPE: ${{ github.event.client_payload.journey_type }}
           JOURNEY_ID: ${{ github.event.client_payload.journey_id }}
           ACCOUNT_ID: ${{ github.event.client_payload.account_id }}
-        run: npx playwright test || true
+        run: npx playwright test
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
