@@ -5,7 +5,15 @@ import fs from 'fs';
 // Initialize Firebase Admin
 if (!admin.apps.length) {
   try {
-    const serviceAccount = JSON.parse(fs.readFileSync(config.firebaseServiceAccountPath, 'utf8'));
+    let serviceAccount;
+    if (config.firebaseServiceAccount) {
+      // In production (Render/Vercel), parse the JSON string directly from the environment variable
+      serviceAccount = JSON.parse(config.firebaseServiceAccount);
+    } else if (config.firebaseServiceAccountPath) {
+      // In local development, read from the JSON file
+      serviceAccount = JSON.parse(fs.readFileSync(config.firebaseServiceAccountPath, 'utf8'));
+    }
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
