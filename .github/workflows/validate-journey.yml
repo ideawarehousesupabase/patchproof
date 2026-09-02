@@ -21,7 +21,7 @@ jobs:
       - name: Install Playwright dependencies
         working-directory: server/playwright
         run: |
-          npm ci
+          npm install
           npx playwright install chromium --with-deps
 
       - name: Run journey validation test
