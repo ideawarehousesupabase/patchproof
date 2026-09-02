@@ -3,6 +3,9 @@ import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/lib/app-state";
+import { triggerValidation } from "@/services/backendApi";
+import { useState } from "react";
+import { PlayCircle, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/journeys/")({
   head: () => ({
@@ -25,8 +28,25 @@ export const Route = createFileRoute("/journeys/")({
 });
 
 function JourneysPage() {
-  const { journeys, websites, loading } = useApp();
+  const { journeys, websites, loading, account } = useApp();
   const name = (id: string) => websites.find((w) => w.id === id)?.name ?? id;
+  const [running, setRunning] = useState(false);
+
+  const handleRunAll = async () => {
+    if (!account?.id) return;
+    setRunning(true);
+    try {
+      for (const j of journeys) {
+        if (j.status !== "Passed" && j.status !== "Not Present") {
+          await triggerValidation(j.id, account.id);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to run all validations", e);
+    } finally {
+      setRunning(false);
+    }
+  };
 
   return (
     <AppLayout title="Journeys">
@@ -37,7 +57,12 @@ function JourneysPage() {
             Validate that business-critical customer journeys still work after website changes.
           </p>
         </div>
-
+        {journeys.length > 0 && (
+          <Button onClick={handleRunAll} disabled={running}>
+            {running ? <Loader2 className="size-4 animate-spin mr-2" /> : <PlayCircle className="size-4 mr-2" />}
+            {running ? "Running Tests..." : "Run all validation tests"}
+          </Button>
+        )}
       </div>
 
       <div className="surface mt-5 overflow-hidden">
