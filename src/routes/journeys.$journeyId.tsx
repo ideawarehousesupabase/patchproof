@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { CheckCircle2, Loader2, PlayCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, Loader2, PlayCircle, XCircle } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -30,10 +30,17 @@ export const Route = createFileRoute("/journeys/$journeyId")({
 
 function JourneyDetailPage() {
   const { journeyId } = useParams({ from: "/journeys/$journeyId" });
-  const { journeys, websites, issues, triggerLiveValidation, backendAvailable } = useApp();
+  const { journeys, websites, issues, triggerLiveValidation } = useApp();
   const journey = journeys.find((j) => j.id === journeyId);
 
   const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    // If Firestore updates the status to Passed or Failed while we are in the running state, clear it!
+    if (journey && (journey.status === "Passed" || journey.status === "Failed")) {
+      setRunning(false);
+    }
+  }, [journey?.status]);
 
   if (!journey) {
     return (
@@ -64,8 +71,6 @@ function JourneyDetailPage() {
       toast.error("Failed to trigger validation.");
       setRunning(false);
     }
-    // We leave running=true if successful because the Firestore snapshot will update the journey status eventually.
-    // In a real app we might poll or listen, but Firestore handles that automatically for us here!
   }
 
   return (
@@ -134,7 +139,7 @@ function JourneyDetailPage() {
                         : "border-border bg-neutral-soft text-muted-foreground",
                   )}
                 >
-                  {isDone ? <CheckCircle2 className="size-3.5" /> : idx + 1}
+                  {isDone ? <CheckCircle2 className="size-3.5" /> : isFailed ? <XCircle className="size-3.5" /> : idx + 1}
                 </span>
                 <span className="flex-1 text-sm font-medium">{step.name}</span>
                 {isActive ? (
@@ -144,9 +149,11 @@ function JourneyDetailPage() {
                   </span>
                 ) : isDone ? (
                   <span className="text-xs font-medium text-success">✓ Passed</span>
+                ) : isFailed ? (
+                  <span className="text-xs font-medium text-danger">Failed</span>
                 ) : (
                   <span className="text-xs text-muted-foreground">
-                    {running ? "Queued" : "Validation Required"}
+                    Validation Required
                   </span>
                 )}
               </li>
@@ -167,6 +174,23 @@ function JourneyDetailPage() {
           </p>
           {relatedIssue && (
             <Button asChild className="mt-4">
+              <Link to="/evidence">View Proof-of-Repair evidence</Link>
+            </Button>
+          )}
+        </section>
+      )}
+
+      {journey.status === "Failed" && (
+        <section className="mt-4 rounded-lg border border-danger/25 bg-danger-soft p-5">
+          <div className="flex items-center gap-2 text-danger">
+            <XCircle className="size-5" />
+            <h3 className="text-sm font-semibold">Journey Failed</h3>
+          </div>
+          <p className="mt-2 text-sm text-danger/90">
+            The {journey.name.toLowerCase()} journey failed during validation. Please check the Evidence tab for screenshots to see what broke.
+          </p>
+          {relatedIssue && (
+            <Button asChild variant="outline" className="mt-4 border-danger/25 text-danger hover:bg-danger/10">
               <Link to="/evidence">View Proof-of-Repair evidence</Link>
             </Button>
           )}
