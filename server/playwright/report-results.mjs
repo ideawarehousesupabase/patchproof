@@ -36,7 +36,7 @@ if (existsSync(reportPath)) {
     const report = JSON.parse(readFileSync(reportPath, "utf-8"));
     const suites = report.suites || [];
 
-    for (const suite of suites) {
+    function processSuite(suite) {
       for (const spec of suite.specs || []) {
         for (const testResult of spec.tests || []) {
           totalTests++;
@@ -49,6 +49,13 @@ if (existsSync(reportPath)) {
           }
         }
       }
+      for (const childSuite of suite.suites || []) {
+        processSuite(childSuite);
+      }
+    }
+
+    for (const suite of suites) {
+      processSuite(suite);
     }
 
     // Three-way status: Failed > Passed > No Coverage
