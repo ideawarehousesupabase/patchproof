@@ -37,7 +37,7 @@ function JourneyDetailPage() {
 
   useEffect(() => {
     // If Firestore updates the status to Passed or Failed while we are in the running state, clear it!
-    if (journey && (journey.status === "Passed" || journey.status === "Failed" || journey.status === "No Coverage")) {
+    if (journey && (journey.status === "Passed" || journey.status === "Failed" || journey.status === "No Coverage" || journey.status === "Not Present")) {
       setRunning(false);
     }
   }, [journey?.status]);
@@ -110,7 +110,7 @@ function JourneyDetailPage() {
         </div>
         <div className="flex flex-col items-end gap-3">
           <StatusBadge status={journey.status} />
-          <Button onClick={runValidation} disabled={running || journey.status === "Passed"}>
+          <Button onClick={runValidation} disabled={running || journey.status === "Passed" || journey.status === "Not Present"}>
             {running ? <Loader2 className="size-4 animate-spin" /> : <PlayCircle className="size-4" />}
             {running ? "Awaiting Results…" : "Run Validation"}
           </Button>

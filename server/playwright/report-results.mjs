@@ -58,17 +58,17 @@ if (existsSync(reportPath)) {
       processSuite(suite);
     }
 
-    // Three-way status: Failed > Passed > No Coverage
+    // Three-way status: Failed > Passed > Not Present
     if (failedTests > 0) journeyStatus = "Failed";
     else if (passedTests > 0) journeyStatus = "Passed";
-    else journeyStatus = "No Coverage"; // all skipped or zero tests — not a failure, just no coverage
+    else journeyStatus = "Not Present"; // all skipped or zero tests — not a failure, just no coverage
   } catch (err) {
     console.error("Failed to parse test report:", err.message);
-    journeyStatus = "No Coverage";
+    journeyStatus = "Not Present";
   }
 } else {
   console.warn("No test report found at", reportPath);
-  journeyStatus = "No Coverage"; // report missing — no evidence of anything, not evidence of failure
+  journeyStatus = "Not Present"; // report missing — no evidence of anything, not evidence of failure
 }
 
 const passed = journeyStatus === "Passed";

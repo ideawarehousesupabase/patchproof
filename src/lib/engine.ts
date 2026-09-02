@@ -677,7 +677,7 @@ export function buildEvidence(
 
 /** DERIVED: journey status from the issues that touch it. */
 export function deriveJourneyStatus(base: JourneyStatus, issues: Issue[], journeyId: string): JourneyStatus {
-  if (base === "Passed" || base === "Failed" || base === "Validation Required" || base === "No Coverage") return base;
+  if (base === "Passed" || base === "Failed" || base === "Validation Required" || base === "Not Present") return base;
   const linked = issues.filter((i) => i.journeyId === journeyId && isOpen(i));
   if (linked.some((i) => i.status === "Validation Required")) return "Validation Required";
   return linked.length ? "At Risk" : base;
