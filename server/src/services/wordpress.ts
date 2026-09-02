@@ -98,7 +98,7 @@ export const headlessUpdatePlugin = async (siteUrl: string, username: string, pa
     } catch (e) {
       // If the selector isn't found, wait a few seconds to ensure the AJAX request fires before closing
       console.log('Update command sent, waiting for completion...');
-      await new Promise(r => setTimeout(r, 8000));
+      await new Promise(r => setTimeout(() => r(null), 8000));
       console.log('Assumed update completed successfully!');
     }
 
@@ -137,7 +137,7 @@ export const headlessExecuteRollback = async (siteUrl: string, username: string,
     const response = await axios({ url: zipUrl, method: 'GET', responseType: 'stream' });
     const writer = fs.createWriteStream(tempZipPath);
     response.data.pipe(writer);
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });

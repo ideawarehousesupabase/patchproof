@@ -50,7 +50,7 @@ export const getWebsite = async (accountId: string, websiteId: string) => {
   if (!doc.exists) {
     throw new Error('Website not found');
   }
-  return doc.data();
+  return doc.data()!;
 };
 
 export const saveEvidence = async (accountId: string, evidence: any) => {
