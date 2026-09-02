@@ -10,8 +10,6 @@ WORKDIR /app
 # Ensure Puppeteer skips downloading a local copy of Chromium 
 # because the base image already has it installed globally
 ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 # Expose port 3001 (Render will automatically inject its own PORT variable)
 ENV PORT=3001
