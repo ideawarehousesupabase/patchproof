@@ -39,6 +39,17 @@ function ProofOfRepairPage() {
     );
   }
 
+  const openScreenshot = (url: string) => {
+    const newTab = window.open();
+    if (newTab) {
+      newTab.document.write(`
+        <body style="margin:0; background:#0e0e10; display:flex; justify-content:center;">
+          <img src="${url}" style="max-width:100%; height:auto;" />
+        </body>
+      `);
+    }
+  };
+
   const website = websites.find((w) => w.id === record.websiteId);
 
   const rows = [
@@ -128,12 +139,12 @@ function ProofOfRepairPage() {
         <div className="surface p-5">
           <h3 className="text-sm font-semibold">Before Repair</h3>
           {record.screenshots?.[0] ? (
-            <a href={record.screenshots[0].url} target="_blank" rel="noreferrer">
+            <div onClick={() => openScreenshot(record.screenshots![0].url)} className="cursor-pointer group relative mt-3">
               <img src={record.screenshots[0].url} alt={record.screenshots[0].step}
-                   className="mt-3 h-24 w-full rounded-md border border-border object-cover object-top" />
-            </a>
+                   className="aspect-video h-auto w-full rounded-md border border-border object-cover object-top transition-opacity group-hover:opacity-90" />
+            </div>
           ) : (
-            <div className="mt-3 h-24 rounded-md border border-dashed border-border bg-muted/50" />
+            <div className="mt-3 aspect-video rounded-md border border-dashed border-border bg-muted/50" />
           )}
           <dl className="mt-4 space-y-2">
             {record.before.map((b) => (
@@ -150,12 +161,12 @@ function ProofOfRepairPage() {
         <div className="surface p-5">
           <h3 className="text-sm font-semibold">After Repair</h3>
           {record.screenshots && record.screenshots.length > 0 ? (
-            <a href={record.screenshots[record.screenshots.length - 1].url} target="_blank" rel="noreferrer">
+            <div onClick={() => openScreenshot(record.screenshots![record.screenshots!.length - 1].url)} className="cursor-pointer group relative mt-3">
               <img src={record.screenshots[record.screenshots.length - 1].url} alt={record.screenshots[record.screenshots.length - 1].step}
-                   className="mt-3 h-24 w-full rounded-md border border-dashed border-success/30 bg-success-soft/50 object-cover object-top" />
-            </a>
+                   className="aspect-video h-auto w-full rounded-md border border-dashed border-success/30 bg-success-soft/50 object-cover object-top transition-opacity group-hover:opacity-90" />
+            </div>
           ) : (
-            <div className="mt-3 h-24 rounded-md border border-dashed border-success/30 bg-success-soft/50" />
+            <div className="mt-3 aspect-video rounded-md border border-dashed border-success/30 bg-success-soft/50" />
           )}
           <dl className="mt-4 space-y-2">
             {record.after.map((a) => (
