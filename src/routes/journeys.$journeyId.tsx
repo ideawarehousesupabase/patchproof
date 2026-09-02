@@ -120,6 +120,8 @@ function JourneyDetailPage() {
           {journey.steps.map((step, idx) => {
             const isDone = journey.status === "Passed";
             const isFailed = journey.status === "Failed";
+            const isActive = running; // For now, all steps show as active while the GitHub Action runs
+            
             return (
               <li key={step.name} className="flex items-center gap-3 px-5 py-3.5">
                 <span
@@ -153,7 +155,7 @@ function JourneyDetailPage() {
         </ul>
       </section>
 
-      {complete && (
+      {journey.status === "Passed" && (
         <section className="mt-4 rounded-lg border border-success/25 bg-success-soft p-5">
           <div className="flex items-center gap-2 text-success">
             <CheckCircle2 className="size-5" />

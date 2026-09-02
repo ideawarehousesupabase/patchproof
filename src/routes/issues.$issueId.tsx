@@ -177,10 +177,21 @@ function IssueDetailPage() {
 
       {issue.status === "Validation Required" && !applying && (
         <div className="mt-4 rounded-lg border border-success/25 bg-success-soft p-4 text-sm text-success">
-          <div className="font-medium">Repair Applied</div>
-          <p className="mt-1 opacity-90">
-            Validation Required — run the affected business journey to confirm the outcome.
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="font-medium">Repair Applied</div>
+              <p className="mt-1 opacity-90">
+                {journey 
+                  ? "Validation Required — run the affected business journey to confirm the outcome."
+                  : "Validation Required — please verify your website is functioning correctly."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={() => setIssueStatus(issue.id, "Resolved")} className="bg-success text-success-foreground hover:bg-success/90">
+                Mark as Resolved
+              </Button>
+            </div>
+          </div>
           <div className="mt-4 border-t border-success/25 pt-4">
              <p className="text-xs font-medium mb-3 text-success">Did the patch break your site? Revert it immediately:</p>
              <form onSubmit={handleUndo} className="flex items-center gap-3">
