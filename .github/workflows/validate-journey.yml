@@ -1,0 +1,54 @@
+name: PatchProof Journey Validation
+
+on:
+  repository_dispatch:
+    types: [validate-journey]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright dependencies
+        working-directory: server/playwright
+        run: |
+          npm ci
+          npx playwright install chromium --with-deps
+
+      - name: Run journey validation test
+        working-directory: server/playwright
+        env:
+          WEBSITE_URL: ${{ github.event.client_payload.website_url }}
+          JOURNEY_TYPE: ${{ github.event.client_payload.journey_type }}
+          JOURNEY_ID: ${{ github.event.client_payload.journey_id }}
+          ACCOUNT_ID: ${{ github.event.client_payload.account_id }}
+        run: npx playwright test --reporter=json --output=results/ 2>&1 | tee test-output.json || true
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: journey-screenshots-${{ github.event.client_payload.journey_id }}
+          path: server/playwright/results/
+          retention-days: 30
+
+      - name: Report results to Firebase
+        if: always()
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          JOURNEY_ID: ${{ github.event.client_payload.journey_id }}
+          ACCOUNT_ID: ${{ github.event.client_payload.account_id }}
+          WEBSITE_URL: ${{ github.event.client_payload.website_url }}
+          JOURNEY_TYPE: ${{ github.event.client_payload.journey_type }}
+        run: |
+          cd server/playwright
+          node report-results.mjs

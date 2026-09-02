@@ -1,0 +1,5 @@
+- `[x]` Install Puppeteer dependency
+- `[x]` Delete PatchProof Agent plugin
+- `[x]` Implement `headlessUpdatePlugin` in `wordpress.ts`
+- `[x]` Update `repair.ts` to use headless execution
+- `[x]` Instruct user to update credentials in UI and test
