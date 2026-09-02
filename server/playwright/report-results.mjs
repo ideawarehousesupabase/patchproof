@@ -111,59 +111,103 @@ try {
     .where("status", "==", "Validation Required")
     .get();
 
-  for (const issueDoc of issuesSnap.docs) {
-    if (passed) {
-      await issueDoc.ref.update({ status: "Resolved" });
-      console.log(`Resolved issue ${issueDoc.id}`);
-    }
+  const journeyDoc = await journeyRef.get();
+  const journey = journeyDoc.data();
 
-    // Create evidence record
-    const issue = issueDoc.data();
+  if (issuesSnap.docs.length > 0) {
+    // This journey has an active repair awaiting validation — resolve it and
+    // produce a Proof-of-Repair record describing the repair that was verified.
+    for (const issueDoc of issuesSnap.docs) {
+      if (passed) {
+        await issueDoc.ref.update({ status: "Resolved" });
+        console.log(`Resolved issue ${issueDoc.id}`);
+      }
+
+      const issue = issueDoc.data();
+      const now = new Date().toISOString();
+      const evidenceId = `PR-${Date.now().toString(36).toUpperCase()}`;
+
+      await db.doc(`users/${ACCOUNT_ID}/evidence/${evidenceId}`).set({
+        websiteId: issue.websiteId,
+        issueId: issueDoc.id,
+        issue: issue.title,
+        risk: issue.severity,
+        outcome: passed ? "Resolved" : "Failed",
+        date: now.split("T")[0],
+        createdAt: now,
+        status: passed ? "Verified" : "Pending",
+        businessImpact: issue.businessImpact,
+        dependencyChain: (issue.dependencies || []).map((d) => d.label).join(" → "),
+        proposedRepair: issue.repair?.proposedRepair || "",
+        safety: `${issue.safety?.riskLevel || "Medium"} Risk — ${issue.safety?.decision || "Reviewed"}`,
+        approval: "Approved",
+        patchPreview: passed ? "Component successfully patched and verified." : "Component patched but validation failed.",
+        repairStatus: passed ? "Applied" : "Rolled Back",
+        validationPerformed: journey?.name ? `${journey.name} Journey` : "Component checks",
+        validationOutcome: passed ? "Passed" : "Failed",
+        rollback: passed ? "Not required" : "Triggered automatic rollback to previous version",
+        before: [
+          { label: journey?.name ? `${journey.name} Journey` : "Component", value: "At Risk" },
+          ...(issue.patchPreview?.current || []),
+        ],
+        after: [
+          { label: journey?.name ? `${journey.name} Journey` : "Component", value: passed ? "Passed" : "Failed" },
+          ...(issue.patchPreview?.proposed || []),
+        ],
+        timeline: [
+          { stage: "Issue detected", time: issue.detected || now },
+          { stage: "Dependencies analysed", time: issue.detected || now },
+          { stage: "Repair proposed", time: issue.detected || now },
+          { stage: "Repair approved", time: now },
+          { stage: "Repair applied", time: now },
+          { stage: "Journey validated (Playwright)", time: now },
+          ...(passed ? [] : [{ stage: "Automatic Rollback applied", time: now }]),
+          { stage: "Evidence verified", time: now },
+        ],
+        screenshots,
+      });
+      console.log(`Created evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
+    }
+  } else if (journeyStatus === "Passed" || journeyStatus === "Failed") {
+    // No repair was tied to this run (e.g. login/search have no vulnerability-driven
+    // issue linked to them) — a journey validation still deserves its own evidence
+    // record so every triggered run is visible on the Evidence page, not only the
+    // ones that happened to have a matching issue.
     const now = new Date().toISOString();
     const evidenceId = `PR-${Date.now().toString(36).toUpperCase()}`;
-    const journeyDoc = await journeyRef.get();
-    const journey = journeyDoc.data();
+    const journeyName = journey?.name || "Journey";
 
     await db.doc(`users/${ACCOUNT_ID}/evidence/${evidenceId}`).set({
-      websiteId: issue.websiteId,
-      issueId: issueDoc.id,
-      issue: issue.title,
-      risk: issue.severity,
-      outcome: passed ? "Resolved" : "Failed",
+      websiteId: journey?.websiteId || "",
+      issueId: "",
+      issue: `${journeyName} Journey Validation`,
+      risk: "Low",
+      outcome: passed ? "Validated" : "Failed",
       date: now.split("T")[0],
       createdAt: now,
       status: passed ? "Verified" : "Pending",
-      businessImpact: issue.businessImpact,
-      dependencyChain: (issue.dependencies || []).map((d) => d.label).join(" → "),
-      proposedRepair: issue.repair?.proposedRepair || "",
-      safety: `${issue.safety?.riskLevel || "Medium"} Risk — ${issue.safety?.decision || "Reviewed"}`,
-      approval: "Approved",
-      patchPreview: passed ? "Component successfully patched and verified." : "Component patched but validation failed.",
-      repairStatus: passed ? "Applied" : "Rolled Back",
-      validationPerformed: journey?.name ? `${journey.name} Journey` : "Component checks",
+      businessImpact: `${journeyName} journey`,
+      dependencyChain: `${journeyName} Journey`,
+      proposedRepair: "",
+      safety: "N/A — routine journey check, no repair involved",
+      approval: "N/A",
+      patchPreview: "N/A — no repair associated with this validation",
+      repairStatus: "N/A",
+      validationPerformed: `${journeyName} Journey`,
       validationOutcome: passed ? "Passed" : "Failed",
-      rollback: passed ? "Not required" : "Triggered automatic rollback to previous version",
-      before: [
-        { label: journey?.name ? `${journey.name} Journey` : "Component", value: "At Risk" },
-        ...(issue.patchPreview?.current || []),
-      ],
-      after: [
-        { label: journey?.name ? `${journey.name} Journey` : "Component", value: passed ? "Passed" : "Failed" },
-        ...(issue.patchPreview?.proposed || []),
-      ],
+      rollback: "Not applicable",
+      before: [{ label: `${journeyName} Journey`, value: "Validation Pending" }],
+      after: [{ label: `${journeyName} Journey`, value: passed ? "Passed" : "Failed" }],
       timeline: [
-        { stage: "Issue detected", time: issue.detected || now },
-        { stage: "Dependencies analysed", time: issue.detected || now },
-        { stage: "Repair proposed", time: issue.detected || now },
-        { stage: "Repair approved", time: now },
-        { stage: "Repair applied", time: now },
-        { stage: "Journey validated (Playwright)", time: now },
-        ...(passed ? [] : [{ stage: "Automatic Rollback applied", time: now }]),
-        { stage: "Evidence verified", time: now },
+        { stage: "Validation triggered", time: now },
+        { stage: "Playwright tests executed", time: now },
+        { stage: passed ? "Journey validated successfully" : "Journey validation failed", time: now },
       ],
       screenshots,
     });
-    console.log(`Created evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
+    console.log(`Created standalone journey evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
+  } else {
+    console.log("No linked issue and no definitive pass/fail outcome — skipping evidence creation.");
   }
 
   console.log("Firebase update complete.");

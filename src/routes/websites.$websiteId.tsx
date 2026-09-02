@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/lib/app-state";
+import { toWebsiteHref } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/websites/$websiteId")({
@@ -84,9 +85,14 @@ function WebsiteDetailPage() {
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{website.name}</h2>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
+            <a
+              href={toWebsiteHref(website.url)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
               {website.url} <ExternalLink className="size-3.5" />
-            </span>
+            </a>
             <span>{website.platform}</span>
             <span>{website.client}</span>
           </div>

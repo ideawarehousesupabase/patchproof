@@ -33,9 +33,11 @@ function JourneysPage() {
 
   const [runningAll, setRunningAll] = useState(false);
 
-  // Journeys whose feature does not exist on the site are skipped — validating
-  // them would only ever record a failure for something that was never there.
-  const runnable = journeys.filter((j) => j.status !== "Not Present");
+  // Skip journeys whose feature doesn't exist on the site (validating them would
+  // only ever record a failure for something that was never there) and journeys
+  // that have already passed (matches the single Run Validation button's own
+  // disabled rule — no need to re-run a check that's already confirmed healthy).
+  const runnable = journeys.filter((j) => j.status !== "Not Present" && j.status !== "Passed");
 
   async function runAllValidations() {
     if (runnable.length === 0) return;
