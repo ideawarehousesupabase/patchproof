@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Loader2, PlayCircle } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/lib/app-state";
-import { triggerValidation } from "@/services/backendApi";
-import { useState } from "react";
-import { PlayCircle, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/journeys/")({
   head: () => ({
@@ -28,25 +28,44 @@ export const Route = createFileRoute("/journeys/")({
 });
 
 function JourneysPage() {
-  const { journeys, websites, loading, account } = useApp();
+  const { journeys, websites, loading, triggerLiveValidation } = useApp();
   const name = (id: string) => websites.find((w) => w.id === id)?.name ?? id;
-  const [running, setRunning] = useState(false);
 
-  const handleRunAll = async () => {
-    if (!account?.id) return;
-    setRunning(true);
-    try {
-      for (const j of journeys) {
-        if (j.status !== "Passed" && j.status !== "Not Present") {
-          await triggerValidation(j.id, account.id);
-        }
+  const [runningAll, setRunningAll] = useState(false);
+
+  // Journeys whose feature does not exist on the site are skipped — validating
+  // them would only ever record a failure for something that was never there.
+  const runnable = journeys.filter((j) => j.status !== "Not Present");
+
+  async function runAllValidations() {
+    if (runnable.length === 0) return;
+    setRunningAll(true);
+
+    let triggered = 0;
+    const failed: string[] = [];
+
+    // Sequential on purpose: each one dispatches its own GitHub Actions run.
+    for (const journey of runnable) {
+      try {
+        const result = await triggerLiveValidation(journey.id);
+        if (result.ok) triggered++;
+        else failed.push(journey.name);
+      } catch {
+        failed.push(journey.name);
       }
-    } catch (e) {
-      console.error("Failed to run all validations", e);
-    } finally {
-      setRunning(false);
     }
-  };
+
+    setRunningAll(false);
+
+    if (triggered > 0) {
+      toast.success(
+        `Validation triggered for ${triggered} journey${triggered === 1 ? "" : "s"}. Results will update automatically.`,
+      );
+    }
+    if (failed.length > 0) {
+      toast.error(`Could not trigger validation for: ${failed.join(", ")}`);
+    }
+  }
 
   return (
     <AppLayout title="Journeys">
@@ -57,12 +76,15 @@ function JourneysPage() {
             Validate that business-critical customer journeys still work after website changes.
           </p>
         </div>
-        {journeys.length > 0 && (
-          <Button onClick={handleRunAll} disabled={running}>
-            {running ? <Loader2 className="size-4 animate-spin mr-2" /> : <PlayCircle className="size-4 mr-2" />}
-            {running ? "Running Tests..." : "Run all validation tests"}
-          </Button>
-        )}
+
+        <Button onClick={runAllValidations} disabled={runningAll || runnable.length === 0}>
+          {runningAll ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <PlayCircle className="size-4" />
+          )}
+          {runningAll ? "Triggering…" : `Run All Validation Tests (${runnable.length})`}
+        </Button>
       </div>
 
       <div className="surface mt-5 overflow-hidden">

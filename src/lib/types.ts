@@ -24,7 +24,14 @@ export type IssueStatus =
   | "Rejected";
 
 export type Risk = "Low" | "Medium" | "High" | "Critical";
-export type JourneyStatus = "Healthy" | "At Risk" | "Validation Required" | "Passed" | "Failed" | "Not Present";
+export type JourneyStatus =
+  | "Healthy"
+  | "At Risk"
+  | "Validation Pending"
+  | "Validation Required"
+  | "Passed"
+  | "Failed"
+  | "Not Present";
 export type EvidenceStatus = "Verified" | "Pending";
 
 /** PRIMARY — exactly what the user provides about a website. */

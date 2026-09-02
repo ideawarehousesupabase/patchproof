@@ -37,7 +37,12 @@ function JourneyDetailPage() {
 
   useEffect(() => {
     // If Firestore updates the status to Passed or Failed while we are in the running state, clear it!
-    if (journey && (journey.status === "Passed" || journey.status === "Failed" || journey.status === "No Coverage" || journey.status === "Not Present")) {
+    if (
+      journey &&
+      (journey.status === "Passed" ||
+        journey.status === "Failed" ||
+        journey.status === "Not Present")
+    ) {
       setRunning(false);
     }
   }, [journey?.status]);
@@ -153,7 +158,7 @@ function JourneyDetailPage() {
                   <span className="text-xs font-medium text-danger">Failed</span>
                 ) : (
                   <span className="text-xs text-muted-foreground">
-                    Validation Required
+                    {journey.status === "Not Present" ? "Not Present" : "Validation Pending"}
                   </span>
                 )}
               </li>
@@ -197,15 +202,17 @@ function JourneyDetailPage() {
         </section>
       )}
 
-      {journey.status === "No Coverage" && (
+      {journey.status === "Not Present" && (
         <section className="mt-4 rounded-lg border border-border bg-neutral-soft p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <AlertCircle className="size-5" />
-            <h3 className="text-sm font-semibold">No Automated Coverage</h3>
+            <h3 className="text-sm font-semibold">Feature Not Present</h3>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            No automated coverage exists yet for this journey type — validation could not run.
-            You can re-trigger validation after adding coverage for this journey.
+            PatchProof could not find a {journey.name.toLowerCase()} feature on{" "}
+            {website?.name ?? "this website"}, so there is nothing to validate. Validation stays
+            disabled to avoid recording a failure for a feature the site does not have. It will be
+            re-enabled automatically if a future scan detects this feature.
           </p>
         </section>
       )}

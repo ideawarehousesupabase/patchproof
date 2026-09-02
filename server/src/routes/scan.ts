@@ -6,6 +6,7 @@ import { checkVulnerabilities } from '../services/scanner.js';
 import { processChange, matchJourneyId, stableHashNum } from '../engine/rules.js';
 import { canAutoApply, isCriticalPlugin } from '../engine/safety.js';
 import { generateRepairPlaybook } from '../engine/playbooks.js';
+import { syncJourneyPresence } from '../services/journey-detect.js';
 import crypto from 'crypto';
 
 const router = Router();
@@ -30,15 +31,18 @@ router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) =
 
     const website = await getWebsite(accountId, websiteId);
 
+    // Fetch journeys once for the entire scan (same website for every plugin) and
+    // work out which of them actually exist on the live site. This runs before the
+    // credential gate because presence detection only needs the public URL.
+    const journeys = await getJourneysForWebsite(accountId, websiteId);
+    await syncJourneyPresence(accountId, website.url, journeys);
+
     if (!website.wpUsername || !website.wpAppPassword) {
       return res.status(400).json({ error: 'WordPress credentials not found for this website' });
     }
 
     const plugins = await fetchPlugins(website.url, website.wpUsername, website.wpAppPassword);
     const scanResults = await checkVulnerabilities(plugins);
-
-    // Fetch journeys once for the entire scan (same website for every plugin)
-    const journeys = await getJourneysForWebsite(accountId, websiteId);
 
     const issues = [];
     const changes = [];

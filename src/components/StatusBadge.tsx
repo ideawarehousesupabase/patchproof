@@ -16,6 +16,7 @@ const toneMap: Record<string, Tone> = {
   Medium: "warning",
   "Awaiting Approval": "warning",
   "Validation Required": "warning",
+  "Validation Pending": "info",
   Pending: "neutral",
   "Not Present": "neutral",
   Critical: "danger",

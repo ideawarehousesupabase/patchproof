@@ -31,6 +31,28 @@ export const fetchPlugins = async (siteUrl: string, username: string, appPasswor
   }
 };
 
+/**
+ * Reads the version WordPress currently reports for a single plugin.
+ *
+ * WordPress always installs the LATEST available release when "Update Now" is
+ * used, which is often newer than the minimum `fixed_in` version reported by
+ * the vulnerability feed — so the real post-repair version has to be read back
+ * from the site rather than assumed.
+ */
+export const getInstalledPluginVersion = async (
+  siteUrl: string,
+  username: string,
+  appPassword: string,
+  pluginSlug: string,
+): Promise<string | null> => {
+  const plugins = await fetchPlugins(siteUrl, username, appPassword);
+  const folderSlug = pluginSlug.split('/')[0];
+  const match =
+    plugins.find((p: any) => p.slug === pluginSlug) ??
+    plugins.find((p: any) => String(p.slug).split('/')[0] === folderSlug);
+  return match?.version ?? null;
+};
+
 export const headlessUpdatePlugin = async (siteUrl: string, username: string, password: string, pluginSlug: string) => {
   try {
     const baseUrl = siteUrl.startsWith('http') ? siteUrl : (siteUrl.includes('localhost') || siteUrl.endsWith('.local') ? `http://${siteUrl}` : `https://${siteUrl}`);
