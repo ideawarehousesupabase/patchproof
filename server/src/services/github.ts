@@ -12,12 +12,12 @@ export const triggerValidation = async (websiteUrl: string, journeyType: string,
     await axios.post(
       url,
       {
-        event_type: 'trigger-validation',
+        event_type: 'validate-journey',
         client_payload: {
-          websiteUrl,
-          journeyType,
-          journeyId,
-          accountId
+          website_url: websiteUrl,
+          journey_type: journeyType,
+          journey_id: journeyId,
+          account_id: accountId
         }
       },
       {
