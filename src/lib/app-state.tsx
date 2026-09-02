@@ -123,8 +123,17 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setUser(readSession());
-    setAuthToken(window.sessionStorage.getItem("patchproof.token"));
+    const sessionUser = readSession();
+    const token = window.sessionStorage.getItem("patchproof.token");
+    
+    if (sessionUser && isBackendConfigured() && !token) {
+      // Force logout of legacy session if backend expects a token
+      window.sessionStorage.removeItem(SESSION_KEY);
+      setUser(null);
+    } else {
+      setUser(sessionUser);
+      setAuthToken(token);
+    }
     setSessionReady(true);
   }, []);
 
