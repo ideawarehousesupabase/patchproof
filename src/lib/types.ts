@@ -24,7 +24,7 @@ export type IssueStatus =
   | "Rejected";
 
 export type Risk = "Low" | "Medium" | "High" | "Critical";
-export type JourneyStatus = "Healthy" | "At Risk" | "Validation Required" | "Passed" | "Failed";
+export type JourneyStatus = "Healthy" | "At Risk" | "Validation Required" | "Passed" | "Failed" | "No Coverage";
 export type EvidenceStatus = "Verified" | "Pending";
 
 /** PRIMARY — exactly what the user provides about a website. */
@@ -111,6 +111,8 @@ export type Journey = {
   steps: JourneyStep[];
 };
 
+export type EvidenceScreenshot = { step: string; url: string };
+
 /** DERIVED when an issue completes its assurance workflow. */
 export type EvidenceRecord = {
   id: string;
@@ -135,6 +137,7 @@ export type EvidenceRecord = {
   before: { label: string; value: string }[];
   after: { label: string; value: string }[];
   timeline: { stage: string; time: string }[];
+  screenshots?: EvidenceScreenshot[];
 };
 
 /** A website plus everything the UI derives from its related records. */

@@ -21,7 +21,7 @@ test.describe("Checkout Journey Validation", () => {
       timeout: 30_000,
     });
     expect(response?.ok()).toBeTruthy();
-    await page.screenshot({ path: "results/01-homepage.png" });
+    await page.screenshot({ path: "results/01-homepage.jpg", type: "jpeg", quality: 55 });
   });
 
   test("Step 2: Shop page is accessible", async ({ page }) => {
@@ -54,7 +54,7 @@ test.describe("Checkout Journey Validation", () => {
     }
 
     expect(shopFound).toBeTruthy();
-    await page.screenshot({ path: "results/02-shop-page.png" });
+    await page.screenshot({ path: "results/02-shop-page.jpg", type: "jpeg", quality: 55 });
   });
 
   test("Step 3: Product page loads", async ({ page }) => {
@@ -75,7 +75,7 @@ test.describe("Checkout Journey Validation", () => {
       await page.waitForLoadState("domcontentloaded");
     }
 
-    await page.screenshot({ path: "results/03-product-page.png" });
+    await page.screenshot({ path: "results/03-product-page.jpg", type: "jpeg", quality: 55 });
   });
 
   test("Step 4: Add to Cart button exists", async ({ page }) => {
@@ -100,7 +100,7 @@ test.describe("Checkout Journey Validation", () => {
       'button[name="add-to-cart"], .add_to_cart_button, button:has-text("Add to cart"), button:has-text("Add to basket")'
     );
     const cartExists = await addToCart.isVisible({ timeout: 10_000 }).catch(() => false);
-    await page.screenshot({ path: "results/04-add-to-cart.png" });
+    await page.screenshot({ path: "results/04-add-to-cart.jpg", type: "jpeg", quality: 55 });
     expect(cartExists).toBeTruthy();
   });
 
@@ -119,7 +119,7 @@ test.describe("Checkout Journey Validation", () => {
       }
     }
 
-    await page.screenshot({ path: "results/05-checkout-page.png" });
+    await page.screenshot({ path: "results/05-checkout-page.jpg", type: "jpeg", quality: 55 });
     expect(found).toBeTruthy();
   });
 });

@@ -37,6 +37,7 @@ import {
   applyRepair as apiApplyRepair,
   undoRepair as apiUndoRepair,
   triggerValidation as apiTriggerValidation,
+  setAuthToken,
   type ScanResult,
   type RepairResult,
   type ValidateResult,
@@ -87,7 +88,6 @@ type AppState = {
   deleteIssue: (id: string) => Promise<void>;
   setIssueStatus: (id: string, status: IssueStatus) => Promise<void>;
   setJourneyStatus: (id: string, status: JourneyStatus) => Promise<void>;
-  completeValidation: (journeyId: string) => Promise<void>;
 
   /* ── Backend integration (optional — only available when VITE_BACKEND_URL is set) ── */
   backendAvailable: boolean;
@@ -124,6 +124,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setUser(readSession());
+    setAuthToken(window.sessionStorage.getItem("patchproof.token"));
     setSessionReady(true);
   }, []);
 
@@ -202,6 +203,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     window.sessionStorage.removeItem(SESSION_KEY);
+    window.sessionStorage.removeItem("patchproof.token");
+    setAuthToken(null);
     setUser(null);
   }, []);
 
@@ -393,30 +396,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     [accountId],
   );
 
-  /** Journey validation passed -> resolve linked issues -> generate evidence. */
-  const completeValidation = useCallback(
-    async (journeyId: string) => {
-      if (!accountId) return;
-      const journey = storedJourneys.find((j) => j.id === journeyId);
-      await journeyService.setStatus(accountId, journeyId, "Passed");
 
-      const linked = storedIssues.filter(
-        (i) => i.journeyId === journeyId && i.status === "Validation Required",
-      );
-      const completedAt = new Date().toISOString();
-      for (const issue of linked) {
-        await issueService.setStatus(accountId, issue.id, "Resolved");
-        if (journey) {
-          const record: EvidenceRecord = {
-            id: newId("PR"),
-            ...buildEvidence({ ...issue, status: "Resolved" }, journey, completedAt),
-          };
-          await evidenceService.add(accountId, record);
-        }
-      }
-    },
-    [accountId, storedJourneys, storedIssues],
-  );
 
 
 
@@ -487,7 +467,6 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     deleteIssue,
     setIssueStatus,
     setJourneyStatus,
-    completeValidation,
     purgeAccountData,
     backendAvailable,
     scanWebsite: scanWebsiteFn,

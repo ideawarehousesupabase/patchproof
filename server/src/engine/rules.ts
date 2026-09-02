@@ -146,6 +146,16 @@ export const stableHash = (str: string) => {
   return Math.abs(hash).toString(16).substring(0, 8);
 };
 
+export const stableHashNum = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+};
+
 export const titleCase = (str: string) => str.replace(/\b\w/g, l => l.toUpperCase());
 
 export const bumpSeverity = (score: number, factor: number = 1.2) => Math.min(100, Math.round(score * factor));
@@ -182,3 +192,26 @@ export const processChange = (changeDescription: string, websiteUrl: string) => 
     journeys: journeyTypes.map(t => templateFor(t))
   };
 };
+
+export const JOURNEY_TYPE_MATCH: Record<string, { frontendTypes: string[]; nameKeywords: string[] }> = {
+  checkout:        { frontendTypes: ['Transactional'],                nameKeywords: ['checkout', 'cart', 'donation', 'purchase', 'order'] },
+  contact:         { frontendTypes: ['Lead Generation'],              nameKeywords: ['contact', 'enquiry', 'inquiry', 'lead'] },
+  login:           { frontendTypes: ['User Access'],                  nameKeywords: ['login', 'sign in', 'account', 'registration', 'signup'] },
+  search:          { frontendTypes: ['Discovery'],                    nameKeywords: ['search'] },
+  blog_navigation: { frontendTypes: ['Content', 'Business Function'], nameKeywords: ['blog', 'article', 'news', 'content'] },
+};
+
+export function matchJourneyId(
+  journeys: { id: string; type?: string; name?: string; websiteId: string }[],
+  backendJourneyType: string,
+  websiteId: string,
+): string | undefined {
+  const candidates = journeys.filter(j => j.websiteId === websiteId);
+  const spec = JOURNEY_TYPE_MATCH[backendJourneyType];
+  if (!spec) return undefined;
+  const byType = candidates.find(j => spec.frontendTypes.includes(j.type ?? ''));
+  if (byType) return byType.id;
+  const norm = (s: string) => s.toLowerCase().trim();
+  const byName = candidates.find(j => spec.nameKeywords.some(k => norm(j.name ?? '').includes(k)));
+  return byName?.id;
+}

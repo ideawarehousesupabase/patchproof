@@ -127,7 +127,14 @@ function ProofOfRepairPage() {
       <section className="mt-4 grid gap-4 sm:grid-cols-2">
         <div className="surface p-5">
           <h3 className="text-sm font-semibold">Before Repair</h3>
-          <div className="mt-3 h-24 rounded-md border border-dashed border-border bg-muted/50" />
+          {record.screenshots?.[0] ? (
+            <a href={record.screenshots[0].url} target="_blank" rel="noreferrer">
+              <img src={record.screenshots[0].url} alt={record.screenshots[0].step}
+                   className="mt-3 h-24 w-full rounded-md border border-border object-cover object-top" />
+            </a>
+          ) : (
+            <div className="mt-3 h-24 rounded-md border border-dashed border-border bg-muted/50" />
+          )}
           <dl className="mt-4 space-y-2">
             {record.before.map((b) => (
               <div key={b.label} className="flex items-center justify-between gap-3">
@@ -142,7 +149,14 @@ function ProofOfRepairPage() {
 
         <div className="surface p-5">
           <h3 className="text-sm font-semibold">After Repair</h3>
-          <div className="mt-3 h-24 rounded-md border border-dashed border-success/30 bg-success-soft/50" />
+          {record.screenshots && record.screenshots.length > 0 ? (
+            <a href={record.screenshots[record.screenshots.length - 1].url} target="_blank" rel="noreferrer">
+              <img src={record.screenshots[record.screenshots.length - 1].url} alt={record.screenshots[record.screenshots.length - 1].step}
+                   className="mt-3 h-24 w-full rounded-md border border-dashed border-success/30 bg-success-soft/50 object-cover object-top" />
+            </a>
+          ) : (
+            <div className="mt-3 h-24 rounded-md border border-dashed border-success/30 bg-success-soft/50" />
+          )}
           <dl className="mt-4 space-y-2">
             {record.after.map((a) => (
               <div key={a.label} className="flex items-center justify-between gap-3">

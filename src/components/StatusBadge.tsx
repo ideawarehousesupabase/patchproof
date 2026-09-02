@@ -17,6 +17,7 @@ const toneMap: Record<string, Tone> = {
   "Awaiting Approval": "warning",
   "Validation Required": "warning",
   Pending: "neutral",
+  "No Coverage": "neutral",
   Critical: "danger",
   Failed: "danger",
   High: "danger",

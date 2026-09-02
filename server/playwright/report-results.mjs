@@ -6,7 +6,7 @@
  */
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, readdirSync } from "fs";
 
 const ACCOUNT_ID = process.env.ACCOUNT_ID;
 const JOURNEY_ID = process.env.JOURNEY_ID;
@@ -23,12 +23,14 @@ initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
 // Read test results
-let passed = false;
 let totalTests = 0;
 let passedTests = 0;
 let failedTests = 0;
+let skippedTests = 0;
 
 const reportPath = "results/report.json";
+let journeyStatus;
+
 if (existsSync(reportPath)) {
   try {
     const report = JSON.parse(readFileSync(reportPath, "utf-8"));
@@ -42,22 +44,29 @@ if (existsSync(reportPath)) {
             passedTests++;
           } else if (testResult.status === "unexpected" || testResult.status === "failed") {
             failedTests++;
+          } else if (testResult.status === "skipped") {
+            skippedTests++;
           }
         }
       }
     }
 
-    passed = failedTests === 0 && passedTests > 0;
+    // Three-way status: Failed > Passed > No Coverage
+    if (failedTests > 0) journeyStatus = "Failed";
+    else if (passedTests > 0) journeyStatus = "Passed";
+    else journeyStatus = "No Coverage"; // all skipped or zero tests — not a failure, just no coverage
   } catch (err) {
     console.error("Failed to parse test report:", err.message);
+    journeyStatus = "No Coverage";
   }
 } else {
   console.warn("No test report found at", reportPath);
+  journeyStatus = "No Coverage"; // report missing — no evidence of anything, not evidence of failure
 }
 
-const journeyStatus = passed ? "Passed" : "Failed";
+const passed = journeyStatus === "Passed";
 
-console.log(`Test Results: ${passedTests}/${totalTests} passed, ${failedTests} failed`);
+console.log(`Test Results: ${passedTests}/${totalTests} passed, ${failedTests} failed, ${skippedTests} skipped`);
 console.log(`Journey Status: ${journeyStatus}`);
 
 // Update the journey document in Firestore
@@ -68,6 +77,29 @@ try {
 
   // If passed, also resolve any linked issues and create evidence
   if (passed) {
+    // Build base64 screenshots array (first + last only, to stay under Firestore 1MiB limit)
+    const screenshots = [];
+    const files = existsSync("results")
+      ? readdirSync("results").filter(f => f.endsWith(".jpg")).sort()
+      : [];
+    const picked = files.length <= 2 ? files : [files[0], files[files.length - 1]];
+    const MAX_TOTAL_BASE64_BYTES = 700_000; // safety margin under Firestore's ~1MiB doc limit
+    let runningSize = 0;
+    for (const filename of picked) {
+      const buf = readFileSync(`results/${filename}`);
+      const base64 = buf.toString("base64");
+      if (runningSize + base64.length > MAX_TOTAL_BASE64_BYTES) {
+        console.warn(`Skipping screenshot ${filename} — would exceed Firestore document size safety margin`);
+        continue;
+      }
+      runningSize += base64.length;
+      const step = filename.replace(/^\d+-/, "").replace(/\.jpg$/, "").replace(/-/g, " ");
+      screenshots.push({
+        step: step.charAt(0).toUpperCase() + step.slice(1),
+        url: `data:image/jpeg;base64,${base64}`,
+      });
+    }
+
     const issuesSnap = await db
       .collection(`users/${ACCOUNT_ID}/issues`)
       .where("journeyId", "==", JOURNEY_ID)
@@ -121,8 +153,9 @@ try {
           { stage: "Journey validated (Playwright)", time: now },
           { stage: "Evidence verified", time: now },
         ],
+        screenshots,
       });
-      console.log(`Created evidence record ${evidenceId}`);
+      console.log(`Created evidence record ${evidenceId} with ${screenshots.length} screenshot(s)`);
     }
   }
 

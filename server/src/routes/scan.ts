@@ -1,13 +1,23 @@
 import { Router, Request, Response } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
-import { getWebsite, saveIssue, saveChange } from '../services/firebase-admin.js';
+import { getWebsite, saveIssue, saveChange, getJourneysForWebsite } from '../services/firebase-admin.js';
 import { fetchPlugins } from '../services/wordpress.js';
 import { checkVulnerabilities } from '../services/scanner.js';
-import { processChange } from '../engine/rules.js';
-import { canAutoApply } from '../engine/safety.js';
+import { processChange, matchJourneyId, stableHashNum } from '../engine/rules.js';
+import { canAutoApply, isCriticalPlugin } from '../engine/safety.js';
+import { generateRepairPlaybook } from '../engine/playbooks.js';
 import crypto from 'crypto';
 
 const router = Router();
+
+function computeSafetyScore(vulnSeverity: 'High' | 'Medium', pluginSlug: string, confidence: 'High' | 'Medium' | 'Low', currentVersion: string): number {
+  let score = 90;
+  score -= vulnSeverity === 'High' ? 20 : 8;
+  score -= isCriticalPlugin(pluginSlug) ? 15 : 0;
+  score -= confidence === 'Low' ? 10 : confidence === 'Medium' ? 5 : 0;
+  const tie = stableHashNum(`${pluginSlug}|${currentVersion}`) % 5;
+  return Math.max(20, Math.min(98, score + tie));
+}
 
 router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) => {
   try {
@@ -27,6 +37,9 @@ router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) =
     const plugins = await fetchPlugins(website.url, website.wpUsername, website.wpAppPassword);
     const scanResults = await checkVulnerabilities(plugins);
 
+    // Fetch journeys once for the entire scan (same website for every plugin)
+    const journeys = await getJourneysForWebsite(accountId, websiteId);
+
     const issues = [];
     const changes = [];
 
@@ -35,12 +48,22 @@ router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) =
         const vuln = result.vulnerabilities[0];
         const engineResult = processChange(`${result.slug} vulnerability: ${vuln.title}`, website.url);
         
-        // Mock safety score logic (in real world, base on tests & community data)
-        const safetyScore = 80 + Math.floor(Math.random() * 15);
+        // Deterministic safety score using real signals
+        const safetyScore = computeSafetyScore(vuln.severity, result.slug, engineResult.rule.confidence, result.version);
         const autoApply = canAutoApply(safetyScore, result.slug);
 
+        // Try to link this issue to a real Firestore journey
+        let matchedJourneyId: string | undefined;
+        for (const jType of engineResult.journeyTypes) {
+          matchedJourneyId = matchJourneyId(journeys, jType, websiteId);
+          if (matchedJourneyId) break;
+        }
+        if (!matchedJourneyId) {
+          console.warn(`No matching journey found for issue in ${result.slug} (types: ${engineResult.journeyTypes.join(', ')})`);
+        }
+
         const issueId = crypto.randomUUID();
-        const issue = {
+        const issue: Record<string, any> = {
           id: issueId,
           changeId: crypto.randomUUID(),
           websiteId,
@@ -68,14 +91,7 @@ router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) =
              { label: result.slug, kind: 'technical' },
              { label: 'WordPress Core', kind: 'technical' }
           ],
-          repair: {
-            rootCause: `Outdated plugin ${result.slug} containing known vulnerability: ${vuln.title}`,
-            proposedRepair: `Update ${result.slug} from ${result.version} to ${vuln.fixed_in || 'latest'}`,
-            components: [result.slug],
-            expectedOutcome: 'Vulnerability patched securely.',
-            validationRequired: ['Plugin functionality', 'Core dependent journeys'],
-            rollbackPlan: 'Revert to previous version using WP Rollback.'
-          },
+          repair: generateRepairPlaybook(result.slug, result.version, vuln.fixed_in || 'latest', vuln),
           safety: {
             score: safetyScore,
             riskLevel: autoApply ? 'Low' : 'Medium',
@@ -102,28 +118,31 @@ router.post('/:websiteId', authMiddleware, async (req: Request, res: Response) =
           }
         };
 
+        // Only add journeyId if we found a match (matches frontend convention)
+        if (matchedJourneyId) {
+          issue.journeyId = matchedJourneyId;
+        }
+
         await saveIssue(accountId, issue);
         issues.push(issue);
 
-        // Save related journeys
-        for (const journeyTemplate of engineResult.journeys) {
-          const change = {
-            id: crypto.randomUUID(),
-            websiteId,
-            issueId,
-            component: result.slug,
-            description: `Update ${result.slug} to patch vulnerability`,
-            category: engineResult.rule.category,
-            impact: engineResult.impact,
-            safetyScore,
-            status: 'Proposed',
-            journeys: engineResult.journeyTypes,
-            detectedAt: new Date().toISOString(),
-            createdAt: new Date().toISOString()
-          };
-          await saveChange(accountId, change);
-          changes.push(change);
-        }
+        // Save one change doc per issue (not per journey template — fix duplicate write bug)
+        const change = {
+          id: crypto.randomUUID(),
+          websiteId,
+          issueId,
+          component: result.slug,
+          description: `Update ${result.slug} to patch vulnerability`,
+          category: engineResult.rule.category,
+          impact: engineResult.impact,
+          safetyScore,
+          status: 'Proposed',
+          journeys: engineResult.journeyTypes,
+          detectedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        };
+        await saveChange(accountId, change);
+        changes.push(change);
       }
     }
 

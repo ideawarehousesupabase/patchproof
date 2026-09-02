@@ -8,7 +8,7 @@ export const generateRepairPlaybook = (pluginSlug: string, currentVersion: strin
       `Target: v${newVersion || 'latest'}`
     ],
     expectedOutcome: `Vulnerability patched successfully with no impact on core functionality.`,
-    validationRequired: true,
+    validationRequired: ['Plugin functionality', 'Core dependent journeys'],
     rollbackPlan: `1. Disable plugin.\n2. Restore v${currentVersion} from backup via WP-CLI or FTP.`
   };
 };

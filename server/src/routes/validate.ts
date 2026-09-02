@@ -8,11 +8,7 @@ const router = Router();
 router.post('/:journeyId', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { journeyId } = req.params;
-    const { accountId } = req.body;
-
-    if (!accountId) {
-      return res.status(400).json({ error: 'accountId is required' });
-    }
+    const accountId = (req as any).accountId;
 
     const db = getFirestoreDb();
     const journeyDoc = await db.collection('users').doc(accountId).collection('journeys').doc(journeyId).get();

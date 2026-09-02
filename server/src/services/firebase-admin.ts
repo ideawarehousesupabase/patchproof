@@ -62,3 +62,10 @@ export const updateJourneyStatus = async (accountId: string, journeyId: string, 
   const db = getFirestoreDb();
   await db.collection('users').doc(accountId).collection('journeys').doc(journeyId).update({ status, updatedAt: new Date().toISOString() });
 };
+
+export const getJourneysForWebsite = async (accountId: string, websiteId: string) => {
+  const db = getFirestoreDb();
+  const snap = await db.collection('users').doc(accountId).collection('journeys')
+    .where('websiteId', '==', websiteId).get();
+  return snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
+};

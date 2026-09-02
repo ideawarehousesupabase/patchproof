@@ -8,11 +8,8 @@ const router = Router();
 router.post('/:issueId', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { issueId } = req.params;
-    const { accountId, wpPassword } = req.body;
-
-    if (!accountId) {
-      return res.status(400).json({ error: 'accountId is required' });
-    }
+    const accountId = (req as any).accountId;
+    const { wpPassword } = req.body;
     if (!wpPassword) {
       return res.status(400).json({ error: 'wpPassword is required for the Headless AI Agent' });
     }

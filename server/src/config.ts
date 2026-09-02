@@ -6,6 +6,7 @@ dotenv.config();
 const requiredEnvVars = [
   'WPSCAN_API_TOKEN',
   'API_SECRET_KEY',
+  'JWT_SECRET',
 ];
 
 for (const envVar of requiredEnvVars) {
@@ -26,5 +27,6 @@ export const config = {
   githubRepoOwner: process.env.GITHUB_REPO_OWNER || '',
   githubRepoName: process.env.GITHUB_REPO_NAME || '',
   apiSecretKey: process.env.API_SECRET_KEY as string,
+  jwtSecret: process.env.JWT_SECRET as string,
   port: parseInt(process.env.PORT || '3001', 10),
 };

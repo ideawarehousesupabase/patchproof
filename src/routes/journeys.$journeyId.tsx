@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Loader2, PlayCircle, XCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, PlayCircle, XCircle } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ function JourneyDetailPage() {
 
   useEffect(() => {
     // If Firestore updates the status to Passed or Failed while we are in the running state, clear it!
-    if (journey && (journey.status === "Passed" || journey.status === "Failed")) {
+    if (journey && (journey.status === "Passed" || journey.status === "Failed" || journey.status === "No Coverage")) {
       setRunning(false);
     }
   }, [journey?.status]);
@@ -194,6 +194,19 @@ function JourneyDetailPage() {
               <Link to="/evidence">View Proof-of-Repair evidence</Link>
             </Button>
           )}
+        </section>
+      )}
+
+      {journey.status === "No Coverage" && (
+        <section className="mt-4 rounded-lg border border-border bg-neutral-soft p-5">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <AlertCircle className="size-5" />
+            <h3 className="text-sm font-semibold">No Automated Coverage</h3>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            No automated coverage exists yet for this journey type — validation could not run.
+            You can re-trigger validation after adding coverage for this journey.
+          </p>
         </section>
       )}
     </AppLayout>

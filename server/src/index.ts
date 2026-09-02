@@ -5,6 +5,7 @@ import scanRoutes from './routes/scan.js';
 import repairRoutes from './routes/repair.js';
 import undoRoutes from './routes/undo.js';
 import validateRoutes from './routes/validate.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/scan', scanRoutes);
 app.use('/api/repair', repairRoutes);
 app.use('/api/undo', undoRoutes);

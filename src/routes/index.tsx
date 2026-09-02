@@ -8,6 +8,7 @@ import { findAccountByEmail, hashPassword } from "@/lib/account-store";
 import { useApp } from "@/lib/app-state";
 import { AuthAside } from "@/components/AuthAside";
 import { PasswordInput } from "@/components/PasswordInput";
+import { login as apiLogin, setAuthToken, isBackendConfigured } from "@/services/backendApi";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,6 +56,17 @@ function LoginPage() {
         setError("Invalid email or password.");
         return;
       }
+
+      if (isBackendConfigured()) {
+        const result = await apiLogin(email, password);
+        if (!result.ok) {
+          setError(result.error || "Backend authentication failed.");
+          return;
+        }
+        window.sessionStorage.setItem("patchproof.token", result.data.token);
+        setAuthToken(result.data.token);
+      }
+
       signIn(account);
       navigate({ to: "/overview" });
     } catch {

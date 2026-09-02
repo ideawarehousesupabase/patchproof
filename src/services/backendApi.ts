@@ -9,6 +9,19 @@
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string | undefined)?.trim().replace(/\/$/, "") || "";
 const API_KEY = (import.meta.env.VITE_BACKEND_API_KEY as string | undefined)?.trim() || "";
 
+// Module-level auth token storage
+let _authToken: string | null = null;
+
+/** Set the JWT auth token for all subsequent API calls. */
+export function setAuthToken(token: string | null): void {
+  _authToken = token;
+}
+
+/** Get the current auth token. */
+export function getAuthToken(): string | null {
+  return _authToken;
+}
+
 /** Returns true if a real backend server is configured. */
 export function isBackendConfigured(): boolean {
   return Boolean(BACKEND_URL);
@@ -24,12 +37,19 @@ async function apiCall<T>(
   }
 
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    };
+
+    // Attach JWT Bearer token if available
+    if (_authToken) {
+      headers["Authorization"] = `Bearer ${_authToken}`;
+    }
+
     const response = await fetch(`${BACKEND_URL}${path}`, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY,
-      },
+      headers,
       body: body ? JSON.stringify(body) : undefined,
     });
 
@@ -59,6 +79,24 @@ async function apiCall<T>(
 }
 
 // ─── API Functions ──────────────────────────────────────────────────────────
+
+export type LoginResult = {
+  token: string;
+  account: {
+    id: string;
+    fullName: string;
+    agencyName: string;
+    email: string;
+  };
+};
+
+/** Authenticate with the backend and receive a JWT token. */
+export async function login(
+  email: string,
+  password: string,
+): Promise<{ ok: true; data: LoginResult } | { ok: false; error: string }> {
+  return apiCall<LoginResult>("POST", "/api/auth/login", { email, password });
+}
 
 export type ScanResult = {
   issuesFound: number;

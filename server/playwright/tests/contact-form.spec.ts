@@ -24,7 +24,7 @@ test.describe("Contact Form Journey Validation", () => {
       timeout: 30_000,
     });
     expect(response?.ok()).toBeTruthy();
-    await page.screenshot({ path: "results/01-homepage.png" });
+    await page.screenshot({ path: "results/01-homepage.jpg", type: "jpeg", quality: 55 });
   });
 
   test("Step 2: Contact page is accessible", async ({ page }) => {
@@ -56,7 +56,7 @@ test.describe("Contact Form Journey Validation", () => {
       }
     }
 
-    await page.screenshot({ path: "results/02-contact-page.png" });
+    await page.screenshot({ path: "results/02-contact-page.jpg", type: "jpeg", quality: 55 });
     expect(found).toBeTruthy();
   });
 
@@ -92,13 +92,13 @@ test.describe("Contact Form Journey Validation", () => {
         .isVisible({ timeout: 5_000 })
         .catch(() => false);
 
-      await page.screenshot({ path: "results/03-contact-form.png" });
+      await page.screenshot({ path: "results/03-contact-form.jpg", type: "jpeg", quality: 55 });
 
       // At minimum, we expect a form with an email field and a submit button
       expect(hasEmailField || hasNameField).toBeTruthy();
       expect(hasSubmitButton).toBeTruthy();
     } else {
-      await page.screenshot({ path: "results/03-no-form-found.png" });
+      await page.screenshot({ path: "results/03-no-form-found.jpg", type: "jpeg", quality: 55 });
       expect(formExists).toBeTruthy();
     }
   });
