@@ -1,0 +1,755 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--list"
+    ],
+    "configFile": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\playwright.config.ts",
+    "rootDir": "C:/Users/devan/OneDrive/Desktop/Idea Warehouse/Moin/patchproof-mvp/server/playwright/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/devan/OneDrive/Desktop/Idea Warehouse/Moin/patchproof-mvp/server/playwright/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/devan/OneDrive/Desktop/Idea Warehouse/Moin/patchproof-mvp/server/playwright/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json",
+        {
+          "outputFile": "results/report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.62.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "blog-navigation.spec.ts",
+      "file": "blog-navigation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Blog Navigation Journey Validation",
+          "file": "blog-navigation.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Step 1: Blog archive accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a blog navigation journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\blog-navigation.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5fb0f2aec94865c8a0d6-e3228b93baeb3ade6615",
+              "file": "blog-navigation.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Step 2: Click into a post",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a blog navigation journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\blog-navigation.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5fb0f2aec94865c8a0d6-bf486b92e8dc8e80f436",
+              "file": "blog-navigation.spec.ts",
+              "line": 51,
+              "column": 3
+            },
+            {
+              "title": "Step 3: Verify single post page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a blog navigation journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\blog-navigation.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5fb0f2aec94865c8a0d6-2bb3107e8e4bdbb0c869",
+              "file": "blog-navigation.spec.ts",
+              "line": 72,
+              "column": 3
+            },
+            {
+              "title": "Step 4: Check comment form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a blog navigation journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\blog-navigation.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5fb0f2aec94865c8a0d6-6dc45536dbd69a2c324e",
+              "file": "blog-navigation.spec.ts",
+              "line": 99,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "checkout.spec.ts",
+      "file": "checkout.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Checkout Journey Validation",
+          "file": "checkout.spec.ts",
+          "line": 51,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Step 1: Homepage loads successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a checkout journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\checkout.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-f72816f27de79972a7d8",
+              "file": "checkout.spec.ts",
+              "line": 54,
+              "column": 3
+            },
+            {
+              "title": "Step 2: Shop page is accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a checkout journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\checkout.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-eaf54dc8e5a3c86c14c9",
+              "file": "checkout.spec.ts",
+              "line": 63,
+              "column": 3
+            },
+            {
+              "title": "Step 3: Product page loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a checkout journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\checkout.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-d900f9c1a45d36397a80",
+              "file": "checkout.spec.ts",
+              "line": 69,
+              "column": 3
+            },
+            {
+              "title": "Step 4: Add to Cart button exists",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a checkout journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\checkout.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-981f8745d4c0f392cb38",
+              "file": "checkout.spec.ts",
+              "line": 83,
+              "column": 3
+            },
+            {
+              "title": "Step 5: Checkout page is accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a checkout journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\checkout.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "25ab1bfc84c57e3e3a45-7867bc048a399bf4b2c0",
+              "file": "checkout.spec.ts",
+              "line": 103,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "contact-form.spec.ts",
+      "file": "contact-form.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Contact Form Journey Validation",
+          "file": "contact-form.spec.ts",
+          "line": 54,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Step 1: Homepage loads successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a contact form journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\contact-form.spec.ts",
+                        "line": 55,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19bfce10c51128c14abd-011ae6219adf5a72ec69",
+              "file": "contact-form.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "Step 2: Contact page is accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a contact form journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\contact-form.spec.ts",
+                        "line": 55,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19bfce10c51128c14abd-137d6c9d06ab3579b88b",
+              "file": "contact-form.spec.ts",
+              "line": 69,
+              "column": 3
+            },
+            {
+              "title": "Step 3: Contact form exists and has required fields",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a contact form journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\contact-form.spec.ts",
+                        "line": 55,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "19bfce10c51128c14abd-31331f2f3fdf5b740452",
+              "file": "contact-form.spec.ts",
+              "line": 75,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "login.spec.ts",
+      "file": "login.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Login Journey Validation",
+          "file": "login.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Step 1: Homepage loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a login journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\login.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-6c6556bd538c232e0dd8",
+              "file": "login.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Step 2: Find login page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a login journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\login.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-747634daea477c73aa6e",
+              "file": "login.spec.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "Step 3: Login form fields exist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a login journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\login.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-06ba1d57875c394804ed",
+              "file": "login.spec.ts",
+              "line": 53,
+              "column": 3
+            },
+            {
+              "title": "Step 4: Login form is interactive",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a login journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\login.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-32fff6b0d76750430046",
+              "file": "login.spec.ts",
+              "line": 77,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "search.spec.ts",
+      "file": "search.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Search Journey Validation",
+          "file": "search.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Step 1: Homepage loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a search journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\search.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a088064de9fe351eef5f-a9367061455c77e5bcb0",
+              "file": "search.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Step 2: Search input exists",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a search journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\search.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a088064de9fe351eef5f-f70aab409cbd56a2162a",
+              "file": "search.spec.ts",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "Step 3: Submit search query",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a search journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\search.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a088064de9fe351eef5f-9ca1cad2d448f93fcc61",
+              "file": "search.spec.ts",
+              "line": 40,
+              "column": 3
+            },
+            {
+              "title": "Step 4: Search results present",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "Skipping: not a search journey",
+                      "location": {
+                        "file": "C:\\Users\\devan\\OneDrive\\Desktop\\Idea Warehouse\\Moin\\patchproof-mvp\\server\\playwright\\tests\\search.spec.ts",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a088064de9fe351eef5f-dfc8cbf678e8dba353dd",
+              "file": "search.spec.ts",
+              "line": 71,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-02T17:53:44.425Z",
+    "duration": 799.8720000000003,
+    "expected": 0,
+    "skipped": 20,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
