@@ -83,7 +83,7 @@ function IssueDetailPage() {
       if (result.ok) {
         toast.success(result.data.message);
         setIssueStatus(issue.id, "Validation Required");
-        if (journey) setJourneyStatus(journey.id, "Validation Required");
+        if (journey) setJourneyStatus(journey.id, "Validation Pending");
       } else {
         toast.error(result.error);
         setIssueStatus(issue.id, "Repair Proposed"); // Reset back to proposed on failure

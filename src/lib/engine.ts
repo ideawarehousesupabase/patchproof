@@ -680,15 +680,12 @@ export function buildEvidence(
 
 /** DERIVED: journey status from the issues that touch it. */
 export function deriveJourneyStatus(base: JourneyStatus, issues: Issue[], journeyId: string): JourneyStatus {
-  if (
-    base === "Passed" ||
-    base === "Failed" ||
-    base === "Validation Required" ||
-    base === "Not Present"
-  )
-    return base;
+  if (base === "Passed" || base === "Failed" || base === "Not Present") return base;
   const linked = issues.filter((i) => i.journeyId === journeyId && isOpen(i));
-  if (linked.some((i) => i.status === "Validation Required")) return "Validation Required";
+  // An issue's own status ("Validation Required") is a distinct concept from a
+  // journey's — a journey that has a repair awaiting confirmation is simply
+  // "Validation Pending", the same status a never-yet-tested journey starts at.
+  if (linked.some((i) => i.status === "Validation Required")) return "Validation Pending";
   return linked.length ? "At Risk" : base;
 }
 

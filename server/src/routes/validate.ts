@@ -20,7 +20,7 @@ router.post('/:journeyId', authMiddleware, async (req: Request, res: Response) =
     const journey = journeyDoc.data()!;
     const website = await getWebsite(accountId, journey.websiteId);
 
-    await updateJourneyStatus(accountId, journeyId, 'Validation Required');
+    await updateJourneyStatus(accountId, journeyId, 'Validation Pending');
 
     await triggerValidation(website.url, journey.type, journeyId, accountId);
 

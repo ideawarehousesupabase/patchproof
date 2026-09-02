@@ -52,6 +52,23 @@ function ProofOfRepairPage() {
 
   const website = websites.find((w) => w.id === record.websiteId);
 
+  // Standalone journey checks (login/search/blog — no vulnerability-driven issue
+  // linked to them) never had a repair applied, so labelling their screenshots
+  // "Before/After Repair" is misleading — the "after" shot is just whatever the
+  // last validation step happened to capture (e.g. a legitimately-empty search
+  // results page), not evidence that anything was fixed.
+  const isStandaloneCheck = !record.issueId;
+  const beforeLabel = isStandaloneCheck ? "Validation Start" : "Before Repair";
+  const afterLabel = isStandaloneCheck ? "Validation Result" : "After Repair";
+
+  // The "after" panel was always styled green regardless of outcome, so a
+  // Failed record's screenshot/badges were shown inside a success-tinted box —
+  // tie the styling to the real outcome instead.
+  const afterFailed = record.outcome === "Failed";
+  const afterImageClass = afterFailed
+    ? "border-danger/30 bg-danger-soft/50"
+    : "border-success/30 bg-success-soft/50";
+
   const rows = [
     { label: "Evidence ID", value: record.id },
     { label: "Website", value: website?.name ?? record.websiteId },
@@ -137,7 +154,7 @@ function ProofOfRepairPage() {
 
       <section className="mt-4 grid gap-4 sm:grid-cols-2">
         <div className="surface p-5">
-          <h3 className="text-sm font-semibold">Before Repair</h3>
+          <h3 className="text-sm font-semibold">{beforeLabel}</h3>
           {record.screenshots?.[0] ? (
             <div onClick={() => openScreenshot(record.screenshots![0].url)} className="cursor-pointer group relative mt-3">
               <img src={record.screenshots[0].url} alt={record.screenshots[0].step}
@@ -159,21 +176,21 @@ function ProofOfRepairPage() {
         </div>
 
         <div className="surface p-5">
-          <h3 className="text-sm font-semibold">After Repair</h3>
+          <h3 className="text-sm font-semibold">{afterLabel}</h3>
           {record.screenshots && record.screenshots.length > 0 ? (
             <div onClick={() => openScreenshot(record.screenshots![record.screenshots!.length - 1].url)} className="cursor-pointer group relative mt-3">
               <img src={record.screenshots[record.screenshots.length - 1].url} alt={record.screenshots[record.screenshots.length - 1].step}
-                   className="aspect-video h-auto w-full rounded-md border border-dashed border-success/30 bg-success-soft/50 object-cover object-top transition-opacity group-hover:opacity-90" />
+                   className={`aspect-video h-auto w-full rounded-md border border-dashed ${afterImageClass} object-cover object-top transition-opacity group-hover:opacity-90`} />
             </div>
           ) : (
-            <div className="mt-3 aspect-video rounded-md border border-dashed border-success/30 bg-success-soft/50" />
+            <div className={`mt-3 aspect-video rounded-md border border-dashed ${afterImageClass}`} />
           )}
           <dl className="mt-4 space-y-2">
             {record.after.map((a) => (
               <div key={a.label} className="flex items-center justify-between gap-3">
                 <dt className="text-xs text-muted-foreground">{a.label}</dt>
                 <dd>
-                  <StatusBadge status={a.value} tone="success" />
+                  <StatusBadge status={a.value} />
                 </dd>
               </div>
             ))}

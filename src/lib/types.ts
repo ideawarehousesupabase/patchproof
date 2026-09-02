@@ -28,7 +28,6 @@ export type JourneyStatus =
   | "Healthy"
   | "At Risk"
   | "Validation Pending"
-  | "Validation Required"
   | "Passed"
   | "Failed"
   | "Not Present";
