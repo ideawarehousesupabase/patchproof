@@ -44,7 +44,7 @@ export const CHANGE_RULES: ChangeRule[] = [
   {
     id: "RULE-SEC-01",
     category: "Security",
-    keywords: ["auth", "login", "register", "password", "captcha", "firewall", "waf", "xss", "sql", "vulnerability"],
+    keywords: ["auth", "login", "register", "password", "captcha", "firewall", "waf", "xss", "sql"],
     severity: 95,
     confidence: "High",
     impactLevel: "Critical",
@@ -93,7 +93,7 @@ export const matchRule = (text: string): ChangeRule => {
   if (!text) return FALLBACK_RULE;
   const lowerText = text.toLowerCase();
   for (const rule of CHANGE_RULES) {
-    if (rule.keywords.some(keyword => lowerText.includes(keyword))) {
+    if (rule.keywords.some(keyword => new RegExp('\\b' + keyword + '\\b', 'i').test(lowerText))) {
       return rule;
     }
   }
