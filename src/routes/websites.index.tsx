@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Globe, Loader2, Plus, HelpCircle } from "lucide-react";
+import { Globe, Loader2, Plus, HelpCircle, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -64,12 +65,30 @@ const emptyForm = {
   wpAppPassword: "",
 };
 
+
+const AVAILABLE_JOURNEYS = [
+  "Checkout",
+  "Account Login",
+  "Contact",
+  "Site Search",
+  "Blog",
+];
+
 function WebsitesPage() {
   const { websites, addWebsite, loading, error } = useApp();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(emptyForm);
+
+  const toggleJourney = (j: string) => {
+    const current = form.businessFunctions.split(',').map(s => s.trim()).filter(Boolean);
+    if (current.includes(j)) {
+      setForm({ ...form, businessFunctions: current.filter((x) => x !== j).join(', ') });
+    } else {
+      setForm({ ...form, businessFunctions: [...current, j].join(', ') });
+    }
+  };
 
   const visible = websites.filter((w) => filter === "All" || w.status === filter);
 
@@ -296,16 +315,27 @@ function WebsitesPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="w-functions">Business-Critical Functions</Label>
-              <Input
-                id="w-functions"
-                maxLength={255}
-                placeholder="Checkout, Contact Form, Account Login"
-                value={form.businessFunctions}
-                onChange={(e) => setForm({ ...form, businessFunctions: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                Comma separated. Each one becomes a protected journey with validation steps.
+              <Label>Business-Critical Functions</Label>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {AVAILABLE_JOURNEYS.map((j) => {
+                  const isSelected = form.businessFunctions
+                    .split(",")
+                    .map((s) => s.trim())
+                    .includes(j);
+                  return (
+                    <Badge
+                      key={j}
+                      variant={isSelected ? "default" : "outline"}
+                      className="cursor-pointer px-3 py-1 text-sm font-medium transition-colors"
+                      onClick={() => toggleJourney(j)}
+                    >
+                      {j}
+                    </Badge>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground pt-1">
+                Select the critical journeys available on this website to generate automated validation steps.
               </p>
             </div>
 
