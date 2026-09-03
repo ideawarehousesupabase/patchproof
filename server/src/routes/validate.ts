@@ -20,9 +20,16 @@ router.post('/:journeyId', authMiddleware, async (req: Request, res: Response) =
     const journey = journeyDoc.data()!;
     const website = await getWebsite(accountId, journey.websiteId);
 
-    await updateJourneyStatus(accountId, journeyId, 'Validation Pending');
-
+    // Trigger first, mark Pending only once GitHub actually confirms the dispatch.
+    // Writing "Validation Pending" before this could succeed left journeys stuck
+    // there forever whenever the trigger failed (missing GitHub config, API error,
+    // network blip) — the UI showed "running" for a validation that never started.
+    // The only place that ever writes Passed/Failed is report-results.mjs inside
+    // the real GitHub Actions run, so gating Pending on trigger success keeps every
+    // "Pending" journey backed by an actual in-flight run.
     await triggerValidation(website.url, journey.type, journeyId, accountId);
+
+    await updateJourneyStatus(accountId, journeyId, 'Validation Pending');
 
     res.json({ success: true, message: 'Validation triggered successfully' });
 
