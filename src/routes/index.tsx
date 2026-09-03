@@ -51,22 +51,33 @@ function LoginPage() {
     }
     setLoading(true);
     try {
+      if (isBackendConfigured()) {
+        // Single source of truth: the backend verifies credentials and returns the
+        // authoritative account.id (the same id signed into the JWT), so the id used
+        // for Firestore reads and the id every backend route looks data up under are
+        // always the same document. Querying `findAccountByEmail` separately here (as
+        // before) meant two independent, unordered `where("email", ...)` lookups that
+        // could each pick a different document if more than one account ever shared
+        // this email — causing "Website/Issue not found" on backend calls even though
+        // the frontend could read the data fine.
+        const result = await apiLogin(email, password);
+        if (!result.ok) {
+          setError(result.error || "Invalid email or password.");
+          return;
+        }
+        window.sessionStorage.setItem("patchproof.token", result.data.token);
+        setAuthToken(result.data.token);
+        signIn({ ...result.data.account, passwordHash: "", createdAt: new Date().toISOString() });
+        navigate({ to: "/overview" });
+        return;
+      }
+
+      // No backend configured (offline/demo mode) — fall back to the client-only check.
       const account = await findAccountByEmail(email);
       if (!account || account.passwordHash !== hashPassword(password)) {
         setError("Invalid email or password.");
         return;
       }
-
-      if (isBackendConfigured()) {
-        const result = await apiLogin(email, password);
-        if (!result.ok) {
-          setError(result.error || "Backend authentication failed.");
-          return;
-        }
-        window.sessionStorage.setItem("patchproof.token", result.data.token);
-        setAuthToken(result.data.token);
-      }
-
       signIn(account);
       navigate({ to: "/overview" });
     } catch {
