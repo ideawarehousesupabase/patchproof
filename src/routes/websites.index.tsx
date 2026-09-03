@@ -290,10 +290,6 @@ function WebsitesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="WordPress">WordPress</SelectItem>
-                    <SelectItem value="WordPress / WooCommerce">WordPress / WooCommerce</SelectItem>
-                    <SelectItem value="Shopify">Shopify</SelectItem>
-                    <SelectItem value="Webflow">Webflow</SelectItem>
-                    <SelectItem value="Custom Build">Custom Build</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
